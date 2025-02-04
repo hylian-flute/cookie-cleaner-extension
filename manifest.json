@@ -2,8 +2,17 @@
   "manifest_version": 3,
   "name": "Cookie Cleaner",
   "version": "1.0",
-  "permissions": ["storage", "cookies", "tabs"],
-  "host_permissions": ["<all_urls>"],
+  "permissions": [
+    "cookies",
+    "tabs",
+    "storage",
+    "scripting",
+    "activeTab",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "background": {
     "service_worker": "background.js"
   },

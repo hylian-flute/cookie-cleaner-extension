@@ -1,18 +1,15 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const domainList = document.getElementById("domainList");
-  const saveButton = document.getElementById("save");
-
-  chrome.storage.sync.get(["domains"], (data) => {
-    domainList.value = (data.domains || []).join("\n");
-  });
-
-  saveButton.addEventListener("click", () => {
-    const domains = domainList.value
-      .split("\n")
-      .map((d) => d.trim())
-      .filter((d) => d);
-    chrome.storage.sync.set({ domains }, () => {
-      alert("保存しました！");
-    });
+document.getElementById('save').addEventListener('click', () => {
+  const urlText = document.getElementById('urls').value;
+  const urls = urlText.split('\n').map(url => url.trim()).filter(url => url);
+  chrome.storage.sync.set({ urls: urls }, () => {
+    alert('URLが保存されました');
   });
 });
+
+window.onload = () => {
+  chrome.storage.sync.get(['urls'], (result) => {
+    if (result.urls) {
+      document.getElementById('urls').value = result.urls.join('\n');
+    }
+  });
+};

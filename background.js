@@ -1,22 +1,26 @@
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === "complete" && tab.url) {
-    chrome.storage.sync.get(["domains"], (data) => {
-      const domains = data.domains || [];
-      const url = new URL(tab.url);
+chrome.webNavigation.onCompleted.addListener(async (details) => {
+  const currentUrl = details.url;
 
-      if (domains.includes(url.hostname)) {
-        if (confirm("Cookieを削除してリロードしますか？")) {
-          chrome.cookies.getAll({ domain: url.hostname }, (cookies) => {
-            cookies.forEach((cookie) => {
-              chrome.cookies.remove({
-                url: `${url.protocol}//${cookie.domain}${cookie.path}`,
-                name: cookie.name,
-              });
-            });
-            chrome.tabs.reload(tabId);
-          });
-        }
-      }
-    });
-  }
+  chrome.storage.sync.get(['urls'], (result) => {
+    if (result.urls && result.urls.includes(currentUrl)) {
+      chrome.scripting.executeScript({
+        target: { tabId: details.tabId },
+        function: askToDeleteCookies
+      });
+    }
+  });
 });
+
+async function askToDeleteCookies() {
+  if (confirm('Cookieを削除してリロードしますか？')) {
+    const url = new URL(window.location.href);
+    const cookies = await chrome.cookies.getAll({ url: url.href });
+    for (const cookie of cookies) {
+      await chrome.cookies.remove({
+        url: url.protocol + "//" + url.hostname + cookie.path,
+        name: cookie.name
+      });
+    }
+    location.reload();
+  }
+}
