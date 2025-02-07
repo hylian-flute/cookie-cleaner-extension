@@ -4,8 +4,7 @@
   "version": "1.0",
   "permissions": [
     "cookies",
-    "storage",
-    "webNavigation"
+    "storage"
   ],
   "host_permissions": [
     "<all_urls>"
